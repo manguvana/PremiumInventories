@@ -1,0 +1,10 @@
+name: PremiumInventories
+main: tk.kalcania.premiuminventories.MainInv
+version: 0.0.1-alpha
+author: manguvana
+commands:
+  creative:
+    usage: /<command>
+    permission: pi.player.creative
+
+
