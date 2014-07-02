@@ -13,17 +13,75 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.enchantments.Enchantment;
+//import org.bukkit.plugin.Plugin;
+//import org.bukkit.enchantments.Enchantment;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainInv extends JavaPlugin implements Listener {
-    private static Plugin instance;
+    //private static Plugin instance;
+    Integer eff1Cost;
+    Integer eff2Cost;
+    Integer eff3Cost;
+    Integer eff4Cost;
+    Integer eff5Cost;
+    Integer effXCost;
+    List<Material> swords = new ArrayList<Material>();
+    List<Material> tools = new ArrayList<Material>();
+    List<Material> stuff = new ArrayList<Material>();
+    List<Material> armor = new ArrayList<Material>();
+    List<Material> others = new ArrayList<Material>();
+
 
     public void onEnable() {
-        List<ItemStack> invsize = new ArrayList<ItemStack>();
+
+        tools.add(Material.DIAMOND_AXE);
+        armor.add(Material.DIAMOND_BOOTS);
+        armor.add(Material.DIAMOND_CHESTPLATE);
+        armor.add(Material.DIAMOND_HELMET);
+        armor.add(Material.DIAMOND_LEGGINGS);
+        tools.add(Material.DIAMOND_PICKAXE);
+        tools.add(Material.DIAMOND_SPADE);
+        swords.add(Material.DIAMOND_SWORD);
+        stuff.add(Material.DIAMOND_HOE);
+
+        tools.add(Material.IRON_AXE);
+        armor.add(Material.IRON_BOOTS);
+        armor.add(Material.IRON_CHESTPLATE);
+        tools.add(Material.IRON_PICKAXE);
+        armor.add(Material.IRON_HELMET);
+        armor.add(Material.IRON_LEGGINGS);
+        tools.add(Material.IRON_SPADE);
+        swords.add(Material.IRON_SWORD);
+        stuff.add(Material.IRON_HOE);
+
+        tools.add(Material.STONE_AXE);
+        tools.add(Material.STONE_PICKAXE);
+        tools.add(Material.STONE_SPADE);
+        swords.add(Material.STONE_SWORD);
+        stuff.add(Material.STONE_HOE);
+
+        tools.add(Material.WOOD_AXE);
+        tools.add(Material.WOOD_PICKAXE);
+        tools.add(Material.WOOD_SPADE);
+        swords.add(Material.WOOD_SWORD);
+        stuff.add(Material.WOOD_HOE);
+
+        stuff.add(Material.SHEARS);
+        others.add(Material.BOW);
+        stuff.add(Material.FLINT_AND_STEEL);
+        stuff.add(Material.CARROT_STICK);
+        others.add(Material.FISHING_ROD);
+
+        saveDefaultConfig();
+        eff1Cost = getConfig().getInt("ench.eff1");
+        eff2Cost = getConfig().getInt("ench.eff2");
+        eff3Cost = getConfig().getInt("ench.eff3");
+        eff4Cost = getConfig().getInt("ench.eff4");
+        eff5Cost = getConfig().getInt("ench.eff5");
+        effXCost = getConfig().getInt("ench.");
+
         instance = this;
     }
     @Override
@@ -36,19 +94,24 @@ public class MainInv extends JavaPlugin implements Listener {
                 return true;
             } else { instance.getLogger().info("InGame only!"); }
         }*/
-        Player p = (Player) sender;
-        if(cmd.getName() == "ench") {
-            if (p instanceof Player) {
+
+        if(cmd.getName().equals("ench")) {
+            if (sender instanceof Player) {
+                Player p = (Player) sender;
                 if (p.hasPermission("pi.player.ench")) {
                     ItemStack is = p.getItemInHand();
-                    Inventory inv = Bukkit.createInventory(null, 9, "Enchanting");
-                    createDisplay(Material.DIAMOND_SWORD, inv, 1, "Combat", "Sword enchantments");
-                    createDisplay(Material.DIAMOND_PICKAXE, inv, 9, "Tools", "Tool enchantments");
-                    Inventory tools = Bukkit.createInventory(null, 9, "Tools");
-                    createDisplay(Material.ENCHANTED_BOOK, tools, 1, "Efficiency I", "Cost" + cost);
-
-                }
-            } else { getLogger().info("InGame only! ):"); }
+                    if (swords.contains(is.getType()) || armor.contains(is.getType()) || tools.contains(is.getType()) || stuff.contains(is.getType()) || others.contains(is.getType())) {
+                        Inventory inv = Bukkit.createInventory(null, 9, "Enchanting");
+                        createDisplay(Material.DIAMOND_SWORD, inv, 1, "§4Combat", "§2Sword enchantments");
+                        createDisplay(Material.DIAMOND_PICKAXE, inv, 9, "§4Tools", "§2Tool enchantments");
+                        createDisplay(Material.DIAMOND_HELMET, inv, 5, "§4Armour", "§2Armour enchantments");
+                        Inventory tools = Bukkit.createInventory(null, 9, "Tools");
+                        createDisplay(Material.ENCHANTED_BOOK, tools, 1, "§4Efficiency I", "§2Cost" + eff1Cost);
+                    } else {
+                        p.sendMessage("§4That item is unenchantable!");
+                    }
+                } else { p.sendMessage("§2You dont have permission to use this."); }
+            }else { getLogger().info("InGame only! ):"); }
         }
         return true;
     }
