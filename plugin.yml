@@ -1,10 +1,10 @@
 name: PremiumInventories
 main: tk.kalcania.premiuminventories.MainInv
-version: 0.0.1-alpha
+version: 0.0.5-a
 author: manguvana
 commands:
-  creative:
+  ench:
     usage: /<command>
-    permission: pi.player.creative
+    permission: pi.player.ench
 
 
