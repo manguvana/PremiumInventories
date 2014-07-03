@@ -1,6 +1,6 @@
 name: PremiumInventories
 main: tk.kalcania.premiuminventories.MainInv
-version: 0.0.5-a
+version: 0.0.10-alpha
 author: manguvana
 commands:
   ench:

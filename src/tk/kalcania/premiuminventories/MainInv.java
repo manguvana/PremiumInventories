@@ -4,41 +4,75 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-/* import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory; */
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-//import org.bukkit.plugin.Plugin;
-//import org.bukkit.enchantments.Enchantment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/* import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory; */
+//import org.bukkit.plugin.Plugin;
+//import org.bukkit.enchantments.Enchantment;
+
 public class MainInv extends JavaPlugin {
-    //private static Plugin instance;
-    Integer eff1Cost;
-    Integer eff2Cost;
-    Integer eff3Cost;
-    Integer eff4Cost;
-    Integer eff5Cost;
-    Integer effXCost;
+    public static Plugin instance;
+    public static Inventory tools1 = Bukkit.createInventory(null, 45, "Tools");
+    public static Inventory inv = Bukkit.createInventory(null, 9, "Enchanting");
+
+    static {
+        createDisplay(Material.DIAMOND_SWORD, inv, 0, "§4Combat", "§2Sword enchantments");
+        createDisplay(Material.DIAMOND_PICKAXE, inv, 8, "§4Tools", "§2Tool enchantments");
+        createDisplay(Material.DIAMOND_HELMET, inv, 4, "§4Armour", "§2Armour enchantments");
+        //seperator
+        createDisplay(Material.ENCHANTED_BOOK, tools1, 0, "§4Efficiency I", "§2Cost §4$" + eff1Cost + "§r");
+        createDisplay(Material.ENCHANTED_BOOK, tools1, 9, "§4Efficiency II", "§2Cost §4$" + eff2Cost + "§r");
+        createDisplay(Material.ENCHANTED_BOOK, tools1, 18, "§4Efficiency III", "§2Cost §4$" + eff3Cost + "§r");
+        createDisplay(Material.ENCHANTED_BOOK, tools1, 27, "§4Efficiency IV", "§2Cost §4$" + eff4Cost + "§r");
+        createDisplay(Material.ENCHANTED_BOOK, tools1, 36, "§4Efficiency V", "§2Cost §4$" + eff5Cost + "§r");
+    }
+
+    static Plugin plugin;
+    private static Integer eff1Cost;
+    private static Integer eff2Cost;
+    private static Integer eff3Cost;
+    private static Integer eff4Cost;
+    private static Integer eff5Cost;
+    private static Integer effXCost;
     List<Material> swords = new ArrayList<Material>();
     List<Material> tools = new ArrayList<Material>();
     List<Material> stuff = new ArrayList<Material>();
     List<Material> armor = new ArrayList<Material>();
     List<Material> others = new ArrayList<Material>();
-    Inventory tools1;
 
+    public MainInv() {
+        this.plugin = plugin;
+    }
+
+    public static void createDisplay(Material material, Inventory inv, int Slot, String name, String lore) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(name);
+        ArrayList<String> Lore = new ArrayList<String>();
+        Lore.add(lore);
+        meta.setLore(Lore);
+        item.setItemMeta(meta);
+
+        inv.setItem(Slot, item);
+
+    }
+
+    public static void openTools(Player p) {
+        MainInv i = new MainInv();
+        p.openInventory(i.tools1);
+    }
 
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(new InvListener(), this);
 
         tools.add(Material.DIAMOND_AXE);
         armor.add(Material.DIAMOND_BOOTS);
@@ -86,10 +120,11 @@ public class MainInv extends JavaPlugin {
         eff5Cost = getConfig().getInt("ench.eff5");
         effXCost = getConfig().getInt("ench.effX");
 
-        //instance = this;
+        instance = this;
     }
+
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
          /*if(sender.hasPermission("pi.player.creative")){
             if (sender instanceof Player) {
                 Player p = (Player) sender;
@@ -99,46 +134,27 @@ public class MainInv extends JavaPlugin {
             } else { instance.getLogger().info("InGame only!"); }
         }*/
 
-        if(cmd.getName().equals("ench")) {
+        if (cmd.getName().equals("ench")) {
             if (sender instanceof Player) {
                 Player p = (Player) sender;
                 if (p.hasPermission("pi.player.ench")) {
                     ItemStack is = p.getItemInHand();
                     if (swords.contains(is.getType()) || armor.contains(is.getType()) || tools.contains(is.getType()) || stuff.contains(is.getType()) || others.contains(is.getType())) {
-                        Inventory inv = Bukkit.createInventory(null, 9, "Enchanting");
-                        createDisplay(Material.DIAMOND_SWORD, inv, 0, "§4Combat", "§2Sword enchantments");
-                        createDisplay(Material.DIAMOND_PICKAXE, inv, 8, "§4Tools", "§2Tool enchantments");
-                        createDisplay(Material.DIAMOND_HELMET, inv, 4, "§4Armour", "§2Armour enchantments");
+
+
                         p.openInventory(inv);
                         tools1 = Bukkit.createInventory(null, 45, "Tools");
-                        createDisplay(Material.ENCHANTED_BOOK, tools1, 0, "§4Efficiency I", "§2Cost §4$" + eff1Cost + "§r");
-                        createDisplay(Material.ENCHANTED_BOOK, tools1, 9, "§4Efficiency II", "§2Cost §4$" + eff2Cost + "§r");
-                        createDisplay(Material.ENCHANTED_BOOK, tools1, 18, "§4Efficiency III", "§2Cost §4$" + eff3Cost + "§r");
-                        createDisplay(Material.ENCHANTED_BOOK, tools1, 27, "§4Efficiency IV", "§2Cost §4$" + eff4Cost + "§r");
-                        createDisplay(Material.ENCHANTED_BOOK, tools1, 36, "§4Efficiency V", "§2Cost §4$" + eff5Cost + "§r");
+
                     } else {
                         p.sendMessage("§4That item is unenchantable!");
                     }
-                } else { p.sendMessage("§2You dont have permission to use this."); }
-            }else { getLogger().info("InGame only! ):"); }
+                } else {
+                    p.sendMessage("§2You dont have permission to use this.");
+                }
+            } else {
+                getLogger().info("InGame only! ):");
+            }
         }
         return true;
-    }
-
-    public static void createDisplay(Material material, Inventory inv, int Slot, String name, String lore) {
-        ItemStack item = new ItemStack(material);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(name);
-        ArrayList<String> Lore = new ArrayList<String>();
-        Lore.add(lore);
-        meta.setLore(Lore);
-        item.setItemMeta(meta);
-
-        inv.setItem(Slot, item);
-
-    }
-    public static void openTools(Player p){
-        MainInv i = new MainInv();
-        p.openInventory(i.tools1);
     }
 }
