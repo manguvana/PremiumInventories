@@ -5,6 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,52 +23,40 @@ import org.bukkit.inventory.Inventory; */
 //import org.bukkit.plugin.Plugin;
 //import org.bukkit.enchantments.Enchantment;
 
-public class MainInv extends JavaPlugin {
-    public static Plugin instance;
+public class MainInv extends JavaPlugin implements Listener {
+    private Player p;
+    private ItemStack is;
+
     public static Inventory tools1 = Bukkit.createInventory(null, 45, "Tools");
     public static Inventory inv = Bukkit.createInventory(null, 9, "Enchanting");
 
-    static {
-        createDisplay(Material.DIAMOND_SWORD, inv, 0, "§4Combat", "§2Sword enchantments");
-        createDisplay(Material.DIAMOND_PICKAXE, inv, 8, "§4Tools", "§2Tool enchantments");
-        createDisplay(Material.DIAMOND_HELMET, inv, 4, "§4Armour", "§2Armour enchantments");
-        //seperator
-        createDisplay(Material.ENCHANTED_BOOK, tools1, 0, "§4Efficiency I", "§2Cost §4$" + eff1Cost + "§r");
-        createDisplay(Material.ENCHANTED_BOOK, tools1, 9, "§4Efficiency II", "§2Cost §4$" + eff2Cost + "§r");
-        createDisplay(Material.ENCHANTED_BOOK, tools1, 18, "§4Efficiency III", "§2Cost §4$" + eff3Cost + "§r");
-        createDisplay(Material.ENCHANTED_BOOK, tools1, 27, "§4Efficiency IV", "§2Cost §4$" + eff4Cost + "§r");
-        createDisplay(Material.ENCHANTED_BOOK, tools1, 36, "§4Efficiency V", "§2Cost §4$" + eff5Cost + "§r");
-    }
-
-    static Plugin plugin;
     private static Integer eff1Cost;
     private static Integer eff2Cost;
     private static Integer eff3Cost;
     private static Integer eff4Cost;
     private static Integer eff5Cost;
     private static Integer effXCost;
+
+    static {
+        createDisplay(Material.DIAMOND_SWORD, inv, 0, "§4Combat", "§2Sword enchantments");
+        createDisplay(Material.DIAMOND_PICKAXE, inv, 8, "§4Tools", "§2Tool enchantments");
+        createDisplay(Material.DIAMOND_HELMET, inv, 4, "§4Armor", "§2Armour enchantments");
+        //seperator
+        /*
+        createDisplay(Material.ENCHANTED_BOOK, tools1, 0, "§4Efficiency I", "§2Cost §4$" + eff1Cost);
+        createDisplay(Material.ENCHANTED_BOOK, tools1, 9, "§4Efficiency II", "§2Cost §4$" + eff2Cost);
+        createDisplay(Material.ENCHANTED_BOOK, tools1, 18, "§4Efficiency III", "§2Cost §4$" + eff3Cost);
+        createDisplay(Material.ENCHANTED_BOOK, tools1, 27, "§4Efficiency IV", "§2Cost §4$" + eff4Cost);
+        createDisplay(Material.ENCHANTED_BOOK, tools1, 36, "§4Efficiency V", "§2Cost §4$" + eff5Cost); */
+    }
+
+    static Plugin plugin;
+
     List<Material> swords = new ArrayList<Material>();
     List<Material> tools = new ArrayList<Material>();
     List<Material> stuff = new ArrayList<Material>();
     List<Material> armor = new ArrayList<Material>();
     List<Material> others = new ArrayList<Material>();
-
-    public MainInv() {
-        this.plugin = plugin;
-    }
-
-    public static void createDisplay(Material material, Inventory inv, int Slot, String name, String lore) {
-        ItemStack item = new ItemStack(material);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(name);
-        ArrayList<String> Lore = new ArrayList<String>();
-        Lore.add(lore);
-        meta.setLore(Lore);
-        item.setItemMeta(meta);
-
-        inv.setItem(Slot, item);
-
-    }
 
     public static void openTools(Player p) {
         MainInv i = new MainInv();
@@ -73,6 +64,7 @@ public class MainInv extends JavaPlugin {
     }
 
     public void onEnable() {
+        Bukkit.getServer().getPluginManager().registerEvents(this, this);
 
         tools.add(Material.DIAMOND_AXE);
         armor.add(Material.DIAMOND_BOOTS);
@@ -119,8 +111,6 @@ public class MainInv extends JavaPlugin {
         eff4Cost = getConfig().getInt("ench.eff4");
         eff5Cost = getConfig().getInt("ench.eff5");
         effXCost = getConfig().getInt("ench.effX");
-
-        instance = this;
     }
 
     @Override
@@ -143,7 +133,7 @@ public class MainInv extends JavaPlugin {
 
 
                         p.openInventory(inv);
-                        tools1 = Bukkit.createInventory(null, 45, "Tools");
+                        createToolsMenu(tools1);
 
                     } else {
                         p.sendMessage("§4That item is unenchantable!");
@@ -157,4 +147,54 @@ public class MainInv extends JavaPlugin {
         }
         return true;
     }
+    public static void createDisplay(Material material, Inventory inv, int Slot, String name, String lore) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(name);
+        ArrayList<String> Lore = new ArrayList<String>();
+        Lore.add(lore);
+        meta.setLore(Lore);
+        item.setItemMeta(meta);
+
+        inv.setItem(Slot, item);
+
+    }
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        is = e.getCurrentItem();
+        p = (Player) e.getWhoClicked();
+
+        if (e.getInventory().getName().equals(MainInv.inv.getName())) {
+            if (is.getItemMeta().getDisplayName() == "§4Tools") {
+                p.closeInventory();
+                p.openInventory(tools1);
+            } else if (is.getItemMeta().getDisplayName() == "§4Armor"){
+                p.sendMessage("Still workin :P");
+                e.setCancelled(true);
+                p.closeInventory();
+            } else if(is.getItemMeta().getDisplayName() == "§4Combat") {
+                p.sendMessage("Still workin :P");
+                e.setCancelled(true);
+                p.closeInventory();
+            } else {
+                e.setCancelled(true);
+            }
+        } else if(e.getInventory().getName().equals(tools1.getName())){
+            if(is.getItemMeta().getDisplayName().equals("§4Efficiency V")){
+                p.sendMessage("Dis iis Eff V");
+                e.setCancelled(true);
+            } else {
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    private void createToolsMenu(Inventory i){
+        createDisplay(Material.ENCHANTED_BOOK, i, 0, "§4Efficiency I", "§2Cost §4$" + eff1Cost);
+        createDisplay(Material.ENCHANTED_BOOK, i, 9, "§4Efficiency II", "§2Cost §4$" + eff2Cost);
+        createDisplay(Material.ENCHANTED_BOOK, i, 18, "§4Efficiency III", "§2Cost §4$" + eff3Cost);
+        createDisplay(Material.ENCHANTED_BOOK, i, 27, "§4Efficiency IV", "§2Cost §4$" + eff4Cost);
+        createDisplay(Material.ENCHANTED_BOOK, i, 36, "§4Efficiency V", "§2Cost §4$" + eff5Cost);
+    }
 }
+
